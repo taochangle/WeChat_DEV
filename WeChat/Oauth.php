@@ -83,5 +83,12 @@ class Oauth extends BasicWeChat
         $url = "https://api.weixin.qq.com/sns/userinfo?access_token={$access_token}&openid={$openid}&lang={$lang}";
         return $this->httpGetForJson($url);
     }
+    
+    /**
+    *获取token
+    **/
+    public function getWeChatAccessToken(){
+      	return $this->getAccessToken();
+    }
 
 }
