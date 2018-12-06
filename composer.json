@@ -1,0 +1,38 @@
+{
+  "type": "library",
+  "name": "taoxin/wechat-dev",
+  "homepage": "https://github.com/taochangle/WeChat_DEV",
+  "description": "WeChat platform and development tools",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "taoxin",
+      "email": "taoxin0704@gmail.com",
+      "homepage": "http://taoxin.tk"
+    }
+  ],
+  "keywords": [
+    "WePay",
+    "WeMini",
+    "WeChat",
+    "WeChatPay",
+    "WeChatDeveloper"
+  ],
+  "require": {
+    "php": ">=5.4",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "ext-openssl": "*"
+  },
+  "autoload": {
+    "classmap": [
+      "Bootstrap.php"
+    ],
+    "psr-4": {
+      "WePay\\": "WePay",
+      "WeMini\\": "WeMini",
+      "WeChat\\": "WeChat",
+      "AliPay\\": "AliPay"
+    }
+  }
+}
