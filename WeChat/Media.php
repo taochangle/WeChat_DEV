@@ -1,5 +1,4 @@
 <?php
-
 namespace WeChat;
 
 use WeChat\Contracts\Tools;
@@ -106,10 +105,12 @@ class Media extends BasicWeChat
      */
     public function addMaterial($filename, $type = 'image', $description = [])
     {
+     // return json_encode([]);
         if (!in_array($type, ['image', 'voice', 'video', 'thumb'])) {
             throw new InvalidResponseException('Invalid Media Type.', '0');
         }
         $url = "https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=ACCESS_TOKEN&type={$type}";
+      
         $this->registerApi($url, __FUNCTION__, func_get_args());
         return $this->httpPostForJson($url, ['media' => Tools::createCurlFile($filename), 'description' => Tools::arr2json($description)], false);
     }
@@ -142,8 +143,10 @@ class Media extends BasicWeChat
      */
     public function delMaterial($media_id)
     {
+      
         $url = "https://api.weixin.qq.com/cgi-bin/material/del_material?access_token=ACCESS_TOKEN";
         $this->registerApi($url, __FUNCTION__, func_get_args());
+     
         return $this->httpPostForJson($url, ['media_id' => $media_id]);
     }
 
@@ -178,4 +181,60 @@ class Media extends BasicWeChat
         $this->registerApi($url, __FUNCTION__, func_get_args());
         return $this->httpPostForJson($url, ['type' => $type, 'offset' => $offset, 'count' => $count]);
     }
+  public function test()
+    {
+      return json_encode([]);
+    }
+    public function tongji($fun, $begin_date, $end_date)
+    {
+        $url = "";
+        switch (strtolower($fun)) {
+            case 'getusersummary':
+                $url = "https://api.weixin.qq.com/datacube/getusersummary?access_token=ACCESS_TOKEN";
+                break;
+            case 'getusercumulate':
+                $url = 'https://api.weixin.qq.com/datacube/getusercumulate?access_token=ACCESS_TOKEN';
+                break;
+            case 'getarticletotal':
+                $url = "https://api.weixin.qq.com/datacube/getarticletotal?access_token=ACCESS_TOKEN";
+                break;
+            case 'getusercumulate':
+                $url = 'https://api.weixin.qq.com/datacube/getusercumulate?access_token=ACCESS_TOKEN';
+                break;
+            case 'getuserread':
+                $url = 'https://api.weixin.qq.com/datacube/getuserread?access_token=ACCESS_TOKEN';
+                break;
+            case 'getuserreadhour':
+                $url = 'https://api.weixin.qq.com/datacube/getuserreadhour?access_token=ACCESS_TOKEN';
+                break;
+            case 'getusershare':
+                $url = 'https://api.weixin.qq.com/datacube/getusershare?access_token=ACCESS_TOKEN';
+                break;
+            case 'getusersharehour':
+                $url = 'https://api.weixin.qq.com/datacube/getusersharehour?access_token=ACCESS_TOKEN';
+                break;
+            default:
+                $url = '';
+            break;
+
+        }
+       
+        if ($url == '') {
+            throw new InvalidResponseException("统计方法{$fun}不存在.", '0');
+        }
+       $data = ['begin_date' => $begin_date,'end_date'=>$end_date];
+        $this->registerApi($url, __FUNCTION__, func_get_args());
+     // return $url;
+        return  $this->httpPostForJson($url, $data);
+    }
+	
+  	public function getComments($msg_data_id,$index,$begin,$count,$type="1"){
+     	$url = "https://api.weixin.qq.com/cgi-bin/comment/list?access_token=ACCESS_TOKEN";
+      	$data = ['msg_data_id' => $msg_data_id,'index'=>$index,'count'=>$count,'count'=>$count,'type'=>$type];
+        $this->registerApi($url, __FUNCTION__, func_get_args());
+        return  $this->httpPostForJson($url, $data);
+    }
+     
 }
+
+ 
