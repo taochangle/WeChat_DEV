@@ -61,6 +61,7 @@ class BasicWeChat
             Tools::$cache_path = $options['cache_path'];
         }
         $this->config = new DataArray($options);
+      file_put_contents('1.log',json_encode($options));
     }
 
     /**
