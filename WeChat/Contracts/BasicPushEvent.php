@@ -2,6 +2,7 @@
 
 namespace WeChat\Contracts;
 
+use think\Exception;
 use WeChat\Exceptions\InvalidArgumentException;
 use WeChat\Exceptions\InvalidDecryptException;
 use WeChat\Exceptions\InvalidResponseException;
@@ -62,6 +63,7 @@ class BasicPushEvent
      */
     public function __construct(array $options)
     {
+
         if (empty($options['appid'])) {
             throw new InvalidArgumentException("Missing Config -- [appid]");
         }
@@ -88,13 +90,24 @@ class BasicPushEvent
                 }
                 $prpcrypt = new \Prpcrypt($this->config->get('encodingaeskey'));
                 $result = Tools::xml2arr($this->postxml);
+                 
+                //file_put_contents('aaa.log',"\r\n".'aaaaaaaaaaaaaaaa'.json_encode($result), FILE_APPEND | LOCK_EX);
                 $array = $prpcrypt->decrypt($result['Encrypt']);
+
                 if (intval($array[0]) > 0) {
                     throw new InvalidResponseException($array[1], $array[0]);
                 }
                 list($this->postxml, $this->appid) = [$array[1], $array[2]];
             }
-            $this->receive = new DataArray(Tools::xml2arr($this->postxml));
+
+            $postxml = Tools::xml2arr($this->postxml);
+
+            if ($postxml){
+                $this->receive = new DataArray($postxml);
+            }else{
+                $this->receive = new DataArray(Tools::xml2arr_msg($this->postxml));
+            }
+
         } elseif ($_SERVER['REQUEST_METHOD'] == "GET" && $this->checkSignature()) {
             @ob_clean();
             exit($this->params->get('echostr'));
