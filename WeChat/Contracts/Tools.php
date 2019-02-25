@@ -2,6 +2,7 @@
 
 namespace WeChat\Contracts;
 
+use think\Exception;
 use WeChat\Exceptions\InvalidArgumentException;
 use WeChat\Exceptions\InvalidResponseException;
 use WeChat\Exceptions\LocalCacheException;
@@ -137,6 +138,18 @@ class Tools
         libxml_disable_entity_loader($entity);
         return json_decode(self::arr2json($data), true);
     }
+    /**
+     * 解析XML内容到数组
+     * @param string $xml
+     * @return array
+     */
+    public static function xml2arr_msg($xml)
+    {
+        $entity = libxml_disable_entity_loader(true);
+        $data = (array)simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        libxml_disable_entity_loader($entity);
+        return json_decode(self::arr2json_msg($data), true);
+    }
 
     /**
      * 数组转xml内容
@@ -145,9 +158,24 @@ class Tools
      */
     public static function arr2json($data)
     {
-        return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
-            return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
-        }, ($jsonData = json_encode($data)) == '[]' ? '{}' : $jsonData);
+            return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
+                return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
+
+            }, ($jsonData = json_encode($data)) == '[]' ? '{}' : $jsonData);
+
+    }
+
+
+
+    /**
+     * 数组转xml内容
+     * @param array $data
+     * @return null|string|string
+     */
+    public static function arr2json_msg($data)
+    {
+        return json_encode($data) == '[]' ? '{}' : json_encode($data);
+
     }
 
     /**
