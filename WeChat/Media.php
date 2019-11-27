@@ -234,6 +234,19 @@ class Media extends BasicWeChat
         $this->registerApi($url, __FUNCTION__, func_get_args());
         return  $this->httpPostForJson($url, $data);
     }
+	/**
+     * 上传图文消息素材【订阅号与服务号认证后均可用】
+     * @param array $data 文件名称
+     * @return array
+     * @throws Exceptions\LocalCacheException
+     * @throws InvalidResponseException
+     */
+    public function uploadNews($data)
+    {
+        $url = "https://api.weixin.qq.com/cgi-bin/media/uploadnews?access_token=ACCESS_TOKEN";
+        $this->registerApi($url, __FUNCTION__, func_get_args());
+        return $this->httpPostForJson($url, $data);
+    }
      
 }
 
