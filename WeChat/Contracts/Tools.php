@@ -186,6 +186,7 @@ class Tools
      */
     public static function json2arr($json)
     {
+        $json =  mb_convert_encoding($json , "UTF-8", "auto");
         $result = json_decode($json, true);
         if (empty($result)) {
             throw new InvalidResponseException('invalid response.', '0');
