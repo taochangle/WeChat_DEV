@@ -18,11 +18,11 @@ class Limit extends BasicWeChat
      * @throws Exceptions\InvalidResponseException
      * @throws Exceptions\LocalCacheException
      */
-    public function clearQuota()
+    public function clearQuota($appid)
     {
         $url = 'https://api.weixin.qq.com/cgi-bin/clear_quota?access_token=ACCESS_TOKEN';
         $this->registerApi($url, __FUNCTION__, func_get_args());
-        return $this->callPostApi($url, ['appid' => $this->config->get('appid')]);
+        return $this->callPostApi($url, ['appid' => $appid]);
     }
 
     /**

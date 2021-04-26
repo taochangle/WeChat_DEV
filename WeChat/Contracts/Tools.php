@@ -138,18 +138,6 @@ class Tools
         libxml_disable_entity_loader($entity);
         return json_decode(self::arr2json($data), true);
     }
-    /**
-     * 解析XML内容到数组
-     * @param string $xml
-     * @return array
-     */
-    public static function xml2arr_msg($xml)
-    {
-        $entity = libxml_disable_entity_loader(true);
-        $data = (array)simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-        libxml_disable_entity_loader($entity);
-        return json_decode(self::arr2json_msg($data), true);
-    }
 
     /**
      * 数组转xml内容
@@ -158,24 +146,9 @@ class Tools
      */
     public static function arr2json($data)
     {
-            return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
-                return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
-
-            }, ($jsonData = json_encode($data)) == '[]' ? '{}' : $jsonData);
-
-    }
-
-
-
-    /**
-     * 数组转xml内容
-     * @param array $data
-     * @return null|string|string
-     */
-    public static function arr2json_msg($data)
-    {
-        return json_encode($data) == '[]' ? '{}' : json_encode($data);
-
+        return preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($matches) {
+            return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
+        }, ($jsonData = json_encode($data)) == '[]' ? '{}' : $jsonData);
     }
 
     /**
@@ -186,14 +159,23 @@ class Tools
      */
     public static function json2arr($json)
     {
+         
+        
+        
         $json =  mb_convert_encoding($json , "UTF-8", "auto");
-        $result = json_decode($json, true);
+        $result = json_decode($json,true);
+        
+        $result =(array)$result;
+        $ret = json_last_error();
         if (empty($result)) {
-            throw new InvalidResponseException('invalid response.', '0');
+            return  $json;
+            throw new InvalidResponseException('invalid response.', $ret);
         }
         if (!empty($result['errcode'])) {
-            throw new InvalidResponseException($result['errmsg'], $result['errcode'], $result);
+            return $result;
+            //throw new InvalidResponseException($result['errmsg'], $result['errcode'], $result);
         }
+        
         return $result;
     }
 
@@ -265,12 +247,16 @@ class Tools
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        list($content) = [curl_exec($curl), curl_close($curl)];
+
+        $content = curl_exec($curl);
         // 清理 CURL 缓存文件
         if (!empty(self::$cache_curl)) foreach (self::$cache_curl as $key => $file) {
             Tools::delCache($file);
             unset(self::$cache_curl[$key]);
         }
+        //file_put_contents('2333.log',time().$content.PHP_EOL, FILE_APPEND);
+        curl_close($curl);
+
         return $content;
     }
 
@@ -310,8 +296,10 @@ class Tools
     public static function pushFile($name, $content)
     {
         $file = self::_getCacheName($name);
+        if(!$file) return false;
         if (!file_put_contents($file, $content)) {
-            throw new LocalCacheException('local file write error.', '0');
+            return false;
+           // throw new LocalCacheException('local file write error.', '0');
         }
         return $file;
     }
@@ -328,7 +316,8 @@ class Tools
     {
         $file = self::_getCacheName($name);
         if (!file_put_contents($file, serialize(['name' => $name, 'value' => $value, 'expired' => time() + intval($expired)]))) {
-            throw new LocalCacheException('local cache error.', '0');
+            return false;
+            //throw new LocalCacheException('local cache error.', '0');
         }
         return $file;
     }
@@ -369,11 +358,15 @@ class Tools
      */
     private static function _getCacheName($name)
     {
-        if (empty(self::$cache_path)) {
-            self::$cache_path = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'Cache' . DIRECTORY_SEPARATOR;
+        try{
+            if (empty(self::$cache_path)) {
+                self::$cache_path = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'Cache' . DIRECTORY_SEPARATOR;
+            }
+            self::$cache_path = rtrim(self::$cache_path, '/\\') . DIRECTORY_SEPARATOR;
+            file_exists(self::$cache_path) || mkdir(self::$cache_path, 0755, true);
+            return self::$cache_path . $name;
+        }catch(\Exception $e){
+            return false;
         }
-        self::$cache_path = rtrim(self::$cache_path, '/\\') . DIRECTORY_SEPARATOR;
-        file_exists(self::$cache_path) || mkdir(self::$cache_path, 0755, true);
-        return self::$cache_path . $name;
     }
 }

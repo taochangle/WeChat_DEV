@@ -94,4 +94,10 @@ class Menu extends BasicWeChat
         return $this->httpPostForJson($url, ['user_id' => $openid]);
     }
 
+    public function get_current_selfmenu_info(){
+        $url = "https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info?access_token=ACCESS_TOKEN";
+        $this->registerApi($url, __FUNCTION__, func_get_args());
+        return $this->httpGetForJson($url);
+    }
+
 }

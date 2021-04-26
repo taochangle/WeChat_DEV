@@ -222,35 +222,77 @@ class Statistics extends BasicWeChat
         return $this->callPostApi($url, ['begin_date' => $begin_date, 'end_date' => $end_date], true);
     }
 
-    /**
-     * 获取消息发送分布月数据
-     * @param string $begin_date 开始日期
-     * @param string $end_date 结束日期，限定查询最多30天数据   时间跨度 30
-     * @return array
-     * @throws \WeChat\Exceptions\InvalidResponseException
-     * @throws \WeChat\Exceptions\LocalCacheException
-     */
-    public function getUpstreamMsgdistMonth($begin_date, $end_date)
-    {
-        $url = 'https://api.weixin.qq.com/datacube/getupstreammsgdistmonth?access_token=ACCESS_TOKEN';
-        $this->registerApi($url, __FUNCTION__, func_get_args());
-        return $this->callPostApi($url, ['begin_date' => $begin_date, 'end_date' => $end_date], true);
-    }
-    
-    /**
-     * 获取接口分析分时数据
-     * @param $begin_date string 开始时间
-     * @param $end_date string 结束时间
-     * @return array
-     */
-    function getinterfacesummaryhour($begin_date, $end_date)
-    {
-        $url = 'https://api.weixin.qq.com/datacube/getinterfacesummaryhour?access_token=ACCESS_TOKEN';
-        $this->registerApi($url, __FUNCTION__, func_get_args());
-        return $this->callPostApi($url, ['begin_date' => $begin_date, 'end_date' => $end_date], true);
-    }
+	/**
+	 * 获取消息发送分布月数据
+	 * @param string $begin_date 开始日期
+	 * @param string $end_date 结束日期，限定查询最多30天数据   时间跨度 30
+	 * @return array
+	 * @throws \WeChat\Exceptions\InvalidResponseException
+	 * @throws \WeChat\Exceptions\LocalCacheException
+	 */
+	public function getUpstreamMsgdistMonth($begin_date, $end_date) {
+		$url = 'https://api.weixin.qq.com/datacube/getupstreammsgdistmonth?access_token=ACCESS_TOKEN';
+		$this->registerApi($url, __FUNCTION__, func_get_args());
+		return $this->callPostApi($url, ['begin_date' => $begin_date, 'end_date' => $end_date], true);
+	}
+
+	/**
+	 * 获取接口分析分时数据
+	 * @param $begin_date string 开始时间
+	 * @param $end_date string 结束时间
+	 * @return array
+	 */
+	public function getinterfacesummaryhour($begin_date, $end_date) {
+		$url = 'https://api.weixin.qq.com/datacube/getinterfacesummaryhour?access_token=ACCESS_TOKEN';
+		$this->registerApi($url, __FUNCTION__, func_get_args());
+		return $this->callPostApi($url, ['begin_date' => $begin_date, 'end_date' => $end_date], true);
+	}
+
+	public function tongji($fun, $begin_date, $end_date) {
+		$url = "";
+		switch (strtolower($fun)) {
+		case 'getusersummary':
+			$url = "https://api.weixin.qq.com/datacube/getusersummary?access_token=ACCESS_TOKEN";
+			break;
+		case 'getusercumulate':
+			$url = 'https://api.weixin.qq.com/datacube/getusercumulate?access_token=ACCESS_TOKEN';
+			break;
+		case 'getarticletotal':
+			$url = "https://api.weixin.qq.com/datacube/getarticletotal?access_token=ACCESS_TOKEN";
+			break;
+		case 'getusercumulate':
+			$url = 'https://api.weixin.qq.com/datacube/getusercumulate?access_token=ACCESS_TOKEN';
+			break;
+		case 'getuserread':
+			$url = 'https://api.weixin.qq.com/datacube/getuserread?access_token=ACCESS_TOKEN';
+			break;
+		case 'getuserreadhour':
+			$url = 'https://api.weixin.qq.com/datacube/getuserreadhour?access_token=ACCESS_TOKEN';
+			break;
+		case 'getusershare':
+			$url = 'https://api.weixin.qq.com/datacube/getusershare?access_token=ACCESS_TOKEN';
+			break;
+		case 'getusersharehour':
+			$url = 'https://api.weixin.qq.com/datacube/getusersharehour?access_token=ACCESS_TOKEN';
+			break;
+		default:
+			$url = '';
+			break;
+
+		}
+
+		if ($url == '') {
+			throw new InvalidResponseException("统计方法{$fun}不存在.", '0');
+		}
+		$data = ['begin_date' => $begin_date, 'end_date' => $end_date];
+		$this->registerApi($url, __FUNCTION__, func_get_args());
+		// return $url;
+		return $this->httpPostForJson($url, $data);
+	}
+	public function getComments($msg_data_id, $index, $begin, $count, $type = "1") {
+		$url = "https://api.weixin.qq.com/cgi-bin/comment/list?access_token=ACCESS_TOKEN";
+		$data = ['msg_data_id' => $msg_data_id, 'index' => $index, 'begin' => $begin, 'count' => $count, 'type' => $type];
+		$this->registerApi($url, __FUNCTION__, func_get_args());
+		return $this->httpPostForJson($url, $data);
+	}
 }
-
-
-
-

@@ -3,6 +3,7 @@
 namespace WeChat;
 
 use WeChat\Contracts\BasicWeChat;
+use WeChat\Contracts\Tools;
 
 /**
  * 微信网页授权
@@ -26,20 +27,52 @@ class Oauth extends BasicWeChat
         return "https://open.weixin.qq.com/connect/oauth2/authorize?appid={$appid}&redirect_uri={$redirect_uri}&response_type=code&scope={$scope}&state={$state}#wechat_redirect";
     }
 
-    /**
-     * 通过 code 获取 AccessToken 和 openid
-     * @return bool|array
-     * @throws Exceptions\InvalidResponseException
-     * @throws Exceptions\LocalCacheException
-     */
-    public function getOauthAccessToken()
-    {
-        $appid = $this->config->get('appid');
-        $appsecret = $this->config->get('appsecret');
-        $code = isset($_GET['code']) ? $_GET['code'] : '';
-        $url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={$appid}&secret={$appsecret}&code={$code}&grant_type=authorization_code";
-        return $this->httpGetForJson($url);
-    }
+	/**
+	 * 通过 code 获取 AccessToken 和 openid
+	 * @return bool|array
+	 * @throws Exceptions\InvalidResponseException
+	 * @throws Exceptions\LocalCacheException
+	 */
+	public function getOauthAccessToken() {
+		$appid = $this->config->get('appid');
+		$appsecret = $this->config->get('appsecret');
+		$code = isset($_GET['code']) ? $_GET['code'] : '';
+		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={$appid}&secret={$appsecret}&code={$code}&grant_type=authorization_code";
+		return $this->httpGetForJson($url);
+	}
+	/**
+	 * 获取或刷新服务 AccessToken
+	 * @return bool|string
+	 * @throws InvalidResponseException
+	 * @throws \WeChat\Exceptions\LocalCacheException
+	 */
+	public function getComponentAccessToken() {
+		$cache = 'wechat_component_access_token';
+		if (($componentAccessToken = Tools::getCache($cache))) {
+			return $componentAccessToken;
+		}
+		$data = [
+			'component_appid' => $this->config->get('component_appid'),
+			'component_appsecret' => $this->config->get('component_appsecret'),
+			'component_verify_ticket' => Tools::getCache('component_verify_ticket'),
+		];
+		$url = 'https://api.weixin.qq.com/cgi-bin/component/api_component_token';
+		$result = $this->httpPostForJson($url, $data);
+		if (empty($result['component_access_token'])) {
+			throw new InvalidResponseException($result['errmsg'], $result['errcode'], $data);
+		}
+		Tools::setCache($cache, $result['component_access_token'], 7000);
+		return $result['component_access_token'];
+	}
+	public function getOauthAccessTokenByCode($authorizerAppid, $code = "") {
+		if (empty($code)) {
+			return false;
+		}
+		$componentAppid = $this->config->get('component_appid');
+		$componentAccessToken = $this->getComponentAccessToken();
+		$url = "https://api.weixin.qq.com/sns/oauth2/component/access_token?appid={$authorizerAppid}&code={$code}&grant_type=authorization_code&component_appid={$componentAppid}&component_access_token={$componentAccessToken}";
+		return $this->httpGetForJson($url);
+	}
 
     /**
      * 刷新AccessToken并续期
