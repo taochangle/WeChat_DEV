@@ -314,12 +314,15 @@ class Tools
      */
     public static function setCache($name, $value = '', $expired = 3600)
     {
+        return cache($name,$value, $expired);
+        /**
         $file = self::_getCacheName($name);
         if (!file_put_contents($file, serialize(['name' => $name, 'value' => $value, 'expired' => time() + intval($expired)]))) {
             return false;
             //throw new LocalCacheException('local cache error.', '0');
         }
         return $file;
+        **/
     }
 
     /**
@@ -329,6 +332,8 @@ class Tools
      */
     public static function getCache($name)
     {
+        return cache($name);
+        /**
         $file = self::_getCacheName($name);
         if (file_exists($file) && ($content = file_get_contents($file))) {
             $data = unserialize($content);
@@ -338,6 +343,7 @@ class Tools
             self::delCache($name);
         }
         return null;
+        **/
     }
 
     /**
@@ -347,8 +353,11 @@ class Tools
      */
     public static function delCache($name)
     {
+        return cache($name,null);
+        /**
         $file = self::_getCacheName($name);
         return file_exists($file) ? unlink($file) : true;
+        **/
     }
 
     /**
