@@ -249,12 +249,12 @@ class Tools
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
 
         $content = curl_exec($curl);
+        if($content===false) throw new InvalidArgumentException("请求失败:".curl_error($curl));
         // 清理 CURL 缓存文件
         if (!empty(self::$cache_curl)) foreach (self::$cache_curl as $key => $file) {
             Tools::delCache($file);
             unset(self::$cache_curl[$key]);
         }
-        //file_put_contents('2333.log',time().$content.PHP_EOL, FILE_APPEND);
         curl_close($curl);
 
         return $content;
