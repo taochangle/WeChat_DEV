@@ -15,7 +15,8 @@ use WeChat\Exceptions\InvalidInstanceException;
  * @method \WeChat\Custom WeChatCustom($options = []) static 微信客服消息
  * @method \WeChat\Limit WeChatLimit($options = []) static 接口调用频次限制
  * @method \WeChat\Media WeChatMedia($options = []) static 微信素材管理
- * @method \WeChat\Draft WeChatDraft($options = []) static 微信素材管理
+ * @method \WeChat\Freepublish WeChatFreepublish($options = []) static 微信发布能力
+ * @method \WeChat\Draft WeChatDraft($options = []) static 微信草稿管理
  * @method \WeChat\Menu WeChatMenu($options = []) static 微信菜单管理
  * @method \WeChat\Oauth WeChatOauth($options = []) static 微信网页授权
  * @method \WeChat\Pay WeChatPay($options = []) static 微信支付商户
