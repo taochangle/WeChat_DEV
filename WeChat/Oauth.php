@@ -123,5 +123,8 @@ class Oauth extends BasicWeChat
     public function getWeChatAccessToken(){
       	return $this->getAccessToken();
     }
+    public function getAuthorizerAccessToken($authorizerAppid){
+        return Tools::getCache("{$authorizerAppid}_access_token");
+    }
 
 }
