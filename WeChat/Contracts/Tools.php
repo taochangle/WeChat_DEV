@@ -6,7 +6,6 @@ use think\Exception;
 use WeChat\Exceptions\InvalidArgumentException;
 use WeChat\Exceptions\InvalidResponseException;
 use WeChat\Exceptions\LocalCacheException;
-
 /**
  * 网络请求支持
  * Class Tools
@@ -86,7 +85,12 @@ class Tools
     public static function createCurlFile($filename, $mimetype = null, $postname = null)
     {
         if (is_null($postname)) $postname = basename($filename);
-        if (is_null($mimetype)) $mimetype = self::getExtMine(pathinfo($filename, 4));
+        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+        if (strpos($ext,'?')!==false){
+            $ext = explode('?',$ext);
+            $ext = $ext[0];
+        }
+        if (is_null($mimetype)) $mimetype = self::getExtMine($ext);
         if (function_exists('curl_file_create')) {
             return curl_file_create($filename, $mimetype, $postname);
         }
@@ -159,12 +163,12 @@ class Tools
      */
     public static function json2arr($json)
     {
-         
-        
-        
+
+
+
         $json =  mb_convert_encoding($json , "UTF-8", "auto");
         $result = json_decode($json,true);
-        
+
         $result =(array)$result;
         $ret = json_last_error();
         if (empty($result)) {
@@ -175,7 +179,7 @@ class Tools
             return $result;
             //throw new InvalidResponseException($result['errmsg'], $result['errcode'], $result);
         }
-        
+
         return $result;
     }
 
@@ -299,7 +303,7 @@ class Tools
         if(!$file) return false;
         if (!file_put_contents($file, $content)) {
             return false;
-           // throw new LocalCacheException('local file write error.', '0');
+            // throw new LocalCacheException('local file write error.', '0');
         }
         return $file;
     }
@@ -315,14 +319,6 @@ class Tools
     public static function setCache($name, $value = '', $expired = 3600)
     {
         return cache($name,$value, $expired);
-        /**
-        $file = self::_getCacheName($name);
-        if (!file_put_contents($file, serialize(['name' => $name, 'value' => $value, 'expired' => time() + intval($expired)]))) {
-            return false;
-            //throw new LocalCacheException('local cache error.', '0');
-        }
-        return $file;
-        **/
     }
 
     /**
@@ -333,17 +329,6 @@ class Tools
     public static function getCache($name)
     {
         return cache($name);
-        /**
-        $file = self::_getCacheName($name);
-        if (file_exists($file) && ($content = file_get_contents($file))) {
-            $data = unserialize($content);
-            if (isset($data['expired']) && (intval($data['expired']) === 0 || intval($data['expired']) >= time())) {
-                return $data['value'];
-            }
-            self::delCache($name);
-        }
-        return null;
-        **/
     }
 
     /**
@@ -354,10 +339,6 @@ class Tools
     public static function delCache($name)
     {
         return cache($name,null);
-        /**
-        $file = self::_getCacheName($name);
-        return file_exists($file) ? unlink($file) : true;
-        **/
     }
 
     /**
