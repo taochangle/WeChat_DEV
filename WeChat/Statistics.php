@@ -254,14 +254,14 @@ class Statistics extends BasicWeChat
 		case 'getusersummary':
 			$url = "https://api.weixin.qq.com/datacube/getusersummary?access_token=ACCESS_TOKEN";
 			break;
-		case 'getusercumulate':
+		case 'getarticlesummary':
 			$url = 'https://api.weixin.qq.com/datacube/getusercumulate?access_token=ACCESS_TOKEN';
 			break;
 		case 'getarticletotal':
 			$url = "https://api.weixin.qq.com/datacube/getarticletotal?access_token=ACCESS_TOKEN";
 			break;
 		case 'getusercumulate':
-			$url = 'https://api.weixin.qq.com/datacube/getusercumulate?access_token=ACCESS_TOKEN';
+			$url = 'https://api.weixin.qq.com/datacube/getarticlesummary?access_token=ACCESS_TOKEN';
 			break;
 		case 'getuserread':
 			$url = 'https://api.weixin.qq.com/datacube/getuserread?access_token=ACCESS_TOKEN';
