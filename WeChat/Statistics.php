@@ -242,8 +242,20 @@ class Statistics extends BasicWeChat
 	 * @param $end_date string 结束时间
 	 * @return array
 	 */
-	public function getinterfacesummaryhour($begin_date, $end_date) {
+	public function getInterfaceSummaryHour($begin_date, $end_date) {
 		$url = 'https://api.weixin.qq.com/datacube/getinterfacesummaryhour?access_token=ACCESS_TOKEN';
+		$this->registerApi($url, __FUNCTION__, func_get_args());
+		return $this->callPostApi($url, ['begin_date' => $begin_date, 'end_date' => $end_date], true);
+	}
+
+    /**
+	 * 获取接口分析数据
+	 * @param $begin_date string 开始时间
+	 * @param $end_date string 结束时间
+	 * @return array
+	 */
+	public function getInterfaceSummary($begin_date, $end_date) {
+		$url = 'https://api.weixin.qq.com/datacube/getinterfacesummary?access_token=ACCESS_TOKEN';
 		$this->registerApi($url, __FUNCTION__, func_get_args());
 		return $this->callPostApi($url, ['begin_date' => $begin_date, 'end_date' => $end_date], true);
 	}
